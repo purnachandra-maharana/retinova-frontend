@@ -1,0 +1,81 @@
+{
+  "imageName": "000c1434d8d7.png",
+  "imagePath": "C:\\Users\\Aditya\\OneDrive\\Documents\\MATLAB\\DR FOLDER IMP\\DATASETS\\SIH26038_NEW\\test_images\\000c1434d8d7.png",
+  "quality": {
+    "status": "POOR",
+    "score": 47.230686663379316,
+    "metrics": {
+      "brightness": 41.359835075467274,
+      "contrast": 49.154456002376683,
+      "sharpness": 1.9485150741533916,
+      "saturation": 100,
+      "retinalCoverage": 74.562798717088711
+    },
+    "enhancement": {
+      "applied": false,
+      "method": "None"
+    }
+  },
+  "prediction": {
+    "class": null,
+    "grade": null,
+    "label": "Classification not performed",
+    "confidence": null,
+    "probabilities": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "classLabels": [
+      "No DR",
+      "Mild NPDR",
+      "Moderate NPDR",
+      "Severe NPDR",
+      "Proliferative DR"
+    ],
+    "task": "Five-class diabetic retinopathy severity classification"
+  },
+  "referral": {
+    "required": false,
+    "status": "Referral assessment deferred",
+    "message": "Ophthalmic referral assessment was deferred because the submitted fundus image was inadequate for reliable automated analysis.",
+    "threshold": "Referral assessment requires successful image analysis"
+  },
+  "xai": {
+    "available": false,
+    "method": "Grad-CAM",
+    "targetLayer": "activation_49_relu",
+    "reductionLayer": "avg_pool",
+    "gradCAMImagePath": "",
+    "interpretation": "Explainability analysis was not performed because image quality was inadequate.",
+    "clinicalLimitation": "Grad-CAM is a coarse class-level explanation and is not a lesion segmentation or independent diagnostic method."
+  },
+  "clinicalMessage": "The submitted fundus image is of inadequate quality for reliable automated screening. Please recapture the image under appropriate acquisition conditions.",
+  "model": {
+    "name": "ResNet-50",
+    "inputSize": [
+      224,
+      224,
+      3
+    ],
+    "task": "Five-class diabetic retinopathy severity classification",
+    "classes": [
+      "Grade 0",
+      "Grade 1",
+      "Grade 2",
+      "Grade 3",
+      "Grade 4"
+    ],
+    "dataset": "APTOS 2019"
+  },
+  "disclaimer": "This system is an AI-assisted diabetic retinopathy screening prototype and is not a medical diagnostic device. The output should not replace comprehensive ophthalmic examination, clinical judgment, or professional medical advice.",
+  "explanationNote": "Grad-CAM provides a coarse visual explanation of image regions contributing to the model prediction. It should not be interpreted as a pixel-level lesion segmentation or definitive anatomical localization.",
+  "annotationNote": "IDRiD expert annotations are used for development and validation of retinal lesion and structure analysis, but are not required during inference on a new patient image.",
+  "system": {
+    "pipeline": "Image Quality -> DR Classification -> Referral Assessment -> Grad-CAM",
+    "status": "Completed",
+    "timestamp": "04-Sep-2026 20:26:35"
+  }
+}

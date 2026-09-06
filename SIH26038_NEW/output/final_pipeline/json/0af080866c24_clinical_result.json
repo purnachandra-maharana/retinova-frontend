@@ -1,0 +1,82 @@
+{
+  "imageName": "0af080866c24.png",
+  "imagePath": "C:\\Users\\Aditya\\OneDrive\\Documents\\MATLAB\\DR FOLDER IMP\\DATASETS\\Project\\data\\APTOS\\test_images\\0af080866c24.png",
+  "quality": {
+    "status": "BORDERLINE",
+    "score": 56.056911179309495,
+    "metrics": {
+      "brightness": 60.977101205065409,
+      "contrast": 30.503580483971316,
+      "sharpness": 12.177864991008576,
+      "saturation": 100,
+      "retinalCoverage": 98.865234375
+    },
+    "enhancement": {
+      "applied": true,
+      "method": "Contrast Limited Adaptive Histogram Equalization (CLAHE)"
+    }
+  },
+  "prediction": {
+    "class": 3,
+    "grade": 3,
+    "label": "Grade 3 - Severe Non-Proliferative Diabetic Retinopathy",
+    "confidence": 99.85505860719914,
+    "probabilities": [
+      0.0014489160272078945,
+      9.14386870201302E-9,
+      4.875599832509766E-7,
+      0.99855058607199143,
+      1.1969486419782804E-9
+    ],
+    "classLabels": [
+      "No DR",
+      "Mild NPDR",
+      "Moderate NPDR",
+      "Severe NPDR",
+      "Proliferative DR"
+    ],
+    "task": "Five-class diabetic retinopathy severity classification"
+  },
+  "referral": {
+    "required": true,
+    "status": "Ophthalmic referral recommended",
+    "message": "The screening model identified referable diabetic retinopathy severity (Grade 2-4). Comprehensive ophthalmic evaluation by a qualified eye-care professional is recommended.",
+    "threshold": "Grades 2-4 considered referable by the prototype screening rule"
+  },
+  "xai": {
+    "available": true,
+    "method": "Grad-CAM",
+    "targetLayer": "activation_49_relu",
+    "classIndex": 4,
+    "classLabel": "3",
+    "gradCAMImagePath": "C:\\Users\\Aditya\\OneDrive\\Documents\\MATLAB\\DR FOLDER IMP\\DATASETS\\SIH26038_NEW\\output\\final_pipeline\\gradcam\\0af080866c24_GradCAM.png",
+    "interpretation": "Grad-CAM highlights image regions that contributed to the predicted diabetic retinopathy classification.",
+    "clinicalLimitation": "The Grad-CAM heatmap is a coarse class-level explanation. It should not be interpreted as pixel-level lesion segmentation, definitive anatomical localization, or an independent diagnostic finding."
+  },
+  "clinicalMessage": "The fundus image was classified after automated contrast enhancement. Clinical interpretation should consider the image-quality limitation.",
+  "model": {
+    "name": "ResNet-50",
+    "inputSize": [
+      224,
+      224,
+      3
+    ],
+    "task": "Five-class diabetic retinopathy severity classification",
+    "classes": [
+      "Grade 0",
+      "Grade 1",
+      "Grade 2",
+      "Grade 3",
+      "Grade 4"
+    ],
+    "dataset": "APTOS 2019"
+  },
+  "disclaimer": "This system is an AI-assisted diabetic retinopathy screening prototype and is not a medical diagnostic device. The output should not replace comprehensive ophthalmic examination, clinical judgment, or professional medical advice.",
+  "explanationNote": "Grad-CAM provides a coarse visual explanation of image regions contributing to the model prediction. It should not be interpreted as a pixel-level lesion segmentation or definitive anatomical localization.",
+  "annotationNote": "IDRiD expert annotations are used for development and validation of retinal lesion and structure analysis, but are not required during inference on a new patient image.",
+  "system": {
+    "pipeline": "Image Quality -> DR Classification -> Referral Assessment -> Grad-CAM",
+    "status": "Completed",
+    "timestamp": "04-Sep-2026 20:43:21"
+  }
+}
