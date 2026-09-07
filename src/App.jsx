@@ -10,7 +10,7 @@ import ScreeningResult from "./pages/phc/ScreeningResult";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import DoctorCaseReview from "./pages/doctor/DoctorCaseReview";
 import ClinicalReport from "./pages/doctor/ClinicalReport";
-import { createPatient, createScreening, getScreenings } from "./services/api";
+import { createPatient, createScreening, getCurrentUser, getScreenings, logout } from "./services/api";
 
 
 function AnimatedRetinaEye({ size = 44, dark = false }) {
@@ -72,20 +72,24 @@ function App() {
      AUTHENTICATION / SESSION
      ========================================================= */
 
-  const [session, setSession] = useState(() => {
-    try {
-      const saved = localStorage.getItem("retinasafe_session");
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
+  const [session, setSession] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [role, setRole] = useState(null);
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((result) => {
+        setSession(result.user);
+        setRole(String(result.user.role || "").toLowerCase());
+      })
+      .catch(() => setSession(null))
+      .finally(() => setAuthLoading(false));
+  }, []);
 
   /* =========================================================
      GLOBAL STATE
      ========================================================= */
 
-  const [role, setRole] = useState(() => session?.role || null);
   const [doctorView, setDoctorView] = useState("dashboard");
   const [selectedCase, setSelectedCase] = useState(null);
   const [doctorReview, setDoctorReview] = useState(null);
@@ -204,7 +208,7 @@ function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("retinasafe_session");
+    logout().catch(() => {});
     setSession(null);
     setRole(null);
     setDoctorView("dashboard");
@@ -274,6 +278,10 @@ function App() {
   /* =========================================================
      AUTHENTICATION GUARD
      ========================================================= */
+
+  if (authLoading) {
+    return <main className="min-h-screen bg-[#061a1d]" aria-busy="true" />;
+  }
 
   if (!session || !role) {
     return <Login onLogin={handleLogin} />;

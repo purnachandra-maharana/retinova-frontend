@@ -1,46 +1,10 @@
 import { useState } from "react";
-
-const DEMO_USERS = [
-  {
-    username: "phc001",
-    password: "retinasafe",
-    role: "phc",
-    roleName: "PHC Worker",
-    fullName: "Demo PHC Worker",
-  },
-  {
-    username: "doctor001",
-    password: "retinasafe",
-    role: "doctor",
-    roleName: "Ophthalmologist",
-    fullName: "Demo Ophthalmologist",
-  },
-];
+import { login } from "../../services/api";
 
 const ROLE_OPTIONS = [
   { value: "phc", label: "PHC Worker", description: "Screen patients at a primary health centre" },
   { value: "doctor", label: "Ophthalmologist", description: "Review cases and make clinical decisions" },
 ];
-
-function getStoredUsers() {
-  try {
-    const saved = localStorage.getItem("retinasafe_users");
-    const users = saved ? JSON.parse(saved) : [];
-    return Array.isArray(users) ? users : [];
-  } catch {
-    return [];
-  }
-}
-
-function createSession(user) {
-  return {
-    username: user.username,
-    role: user.role,
-    roleName: user.roleName,
-    fullName: user.fullName || user.username,
-    loggedInAt: new Date().toISOString(),
-  };
-}
 
 export default function Login({ onLogin }) {
   const [mode, setMode] = useState("signin");
@@ -76,29 +40,23 @@ export default function Login({ onLogin }) {
     }
 
     setLoading(true);
-
-    window.setTimeout(() => {
-      const registeredUsers = getStoredUsers();
-      const allUsers = [...DEMO_USERS, ...registeredUsers];
-
-      const user = allUsers.find(
-        (item) =>
-          item.username.toLowerCase() === normalizedUsername &&
-          item.role === role &&
-          item.password === password
-      );
-
-      if (!user) {
-        setError(`Invalid ${selectedRole.label} credentials. Check your role, username and password.`);
-        setLoading(false);
-        return;
-      }
-
-      const session = createSession(user);
-      localStorage.setItem("retinasafe_session", JSON.stringify(session));
-      setLoading(false);
-      onLogin(session);
-    }, 350);
+    login(normalizedUsername, password)
+      .then((result) => {
+        const user = result.user;
+        const normalizedRole = String(user.role || "").toLowerCase();
+        if (normalizedRole !== role) {
+          throw new Error("Your account is not assigned to the selected role.");
+        }
+        onLogin({
+          ...user,
+          role: normalizedRole,
+          roleName: normalizedRole === "doctor" ? "Ophthalmologist" : "PHC Worker",
+        });
+      })
+      .catch((requestError) => {
+        setError(requestError.message || "Unable to sign in.");
+      })
+      .finally(() => setLoading(false));
   }
 
   function handleRegister(event) {
@@ -135,48 +93,7 @@ export default function Login({ onLogin }) {
       return;
     }
 
-    const registeredUsers = getStoredUsers();
-    const usernameTaken = [...DEMO_USERS, ...registeredUsers].some(
-      (item) => item.username.toLowerCase() === cleanUsername
-    );
-
-    if (usernameTaken) {
-      setError("That username is already registered. Choose another username.");
-      return;
-    }
-
-    const emailTaken = registeredUsers.some(
-      (item) => item.email?.toLowerCase() === cleanEmail
-    );
-
-    if (emailTaken) {
-      setError("That email address is already registered.");
-      return;
-    }
-
-    setLoading(true);
-
-    window.setTimeout(() => {
-      const newUser = {
-        id: `USR-${Date.now()}`,
-        fullName: cleanName,
-        email: cleanEmail,
-        username: cleanUsername,
-        password,
-        role,
-        roleName: selectedRole.label,
-        createdAt: new Date().toISOString(),
-      };
-
-      const updatedUsers = [...registeredUsers, newUser];
-      localStorage.setItem("retinasafe_users", JSON.stringify(updatedUsers));
-
-      setLoading(false);
-      setSuccess("Account created successfully. You can now sign in.");
-      setPassword("");
-      setConfirmPassword("");
-      setMode("signin");
-    }, 450);
+    setError("Account creation is managed by an administrator. Contact your system administrator.");
   }
 
   return (
