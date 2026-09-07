@@ -10,7 +10,14 @@ import ScreeningResult from "./pages/phc/ScreeningResult";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import DoctorCaseReview from "./pages/doctor/DoctorCaseReview";
 import ClinicalReport from "./pages/doctor/ClinicalReport";
-import { createPatient, createScreening, getCurrentUser, getScreenings, logout } from "./services/api";
+import {
+  createPatient,
+  createScreening,
+  getCurrentUser,
+  getPatients,
+  getScreenings,
+  logout,
+} from "./services/api";
 
 
 function AnimatedRetinaEye({ size = 44, dark = false }) {
@@ -2239,23 +2246,10 @@ function PHCMenuPage({ page, session, onBack, onLogout }) {
       try {
         setLoading(true);
         setError("");
-        const API_BASE_URL =
-          import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-
-        const endpoint = page === "patients" ? "/patients" : "/screenings";
-        const response = await fetch(`${API_BASE_URL}${endpoint}`);
-        let data = null;
-        try {
-          data = await response.json();
-        } catch {
-          data = null;
-        }
-
-        if (!response.ok) {
-          throw new Error(
-            data?.message || `Request failed with status ${response.status}`
-          );
-        }
+        const data =
+          page === "patients"
+            ? await getPatients()
+            : await getScreenings();
 
         if (!cancelled) {
           if (page === "patients") {

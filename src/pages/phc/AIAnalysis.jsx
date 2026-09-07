@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { API_BASE_URL } from "../../services/api";
 
 /*
   RetinaSafe — Step 5: AI Analysis
@@ -72,8 +73,7 @@ function AIAnalysis({
   const isPoor = qualityStatus.toUpperCase() === "POOR";
   const hasResult = Boolean(analysisResult);
 
-  const apiBase =
-    import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+  const apiBase = API_BASE_URL;
 
   const backendOrigin = useMemo(() => {
     try {

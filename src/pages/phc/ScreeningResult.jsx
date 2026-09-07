@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { sendScreeningToDoctor } from "../../services/api";
+import { API_BASE_URL, sendScreeningToDoctor } from "../../services/api";
 
 /*
   RetinaSafe — Step 6: Screening Result
@@ -199,14 +199,13 @@ function ScreeningResult({
     analysisResult?.aiResult?.patient_code ||
     "Not available";
 
-  const apiBase =
-    import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+  const apiBase = API_BASE_URL;
 
   const backendOrigin = useMemo(() => {
     try {
       return new URL(apiBase).origin;
     } catch {
-      return "http://localhost:5000";
+      return new URL(API_BASE_URL).origin;
     }
   }, [apiBase]);
 

@@ -171,7 +171,7 @@ export default function Login({ onLogin }) {
               <p className="mt-2 text-slate-400 text-sm leading-relaxed">
                 {mode === "signin"
                   ? "Select your clinical role and enter your account credentials."
-                  : "Create a prototype account for the PHC or ophthalmologist workspace."}
+                  : "Clinical accounts are created and managed by your administrator."}
               </p>
             </div>
 
@@ -282,23 +282,11 @@ export default function Login({ onLogin }) {
               </button>
             </form>
 
-            {mode === "signin" ? (
-              <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-                  Prototype demo access
-                </p>
-                <p className="mt-2 text-xs text-slate-400">
-                  PHC: <span className="text-slate-200 font-semibold">phc001</span> / <span className="text-slate-200 font-semibold">retinasafe</span>
-                </p>
-                <p className="text-xs text-slate-400 mt-1">
-                  Doctor: <span className="text-slate-200 font-semibold">doctor001</span> / <span className="text-slate-200 font-semibold">retinasafe</span>
-                </p>
-              </div>
-            ) : (
-              <p className="mt-5 text-center text-xs text-slate-500 leading-relaxed">
-                Prototype registration stores the account in this browser only. It is not a production authentication system.
-              </p>
-            )}
+            <p className="mt-5 text-center text-xs text-slate-500 leading-relaxed">
+              {mode === "signin"
+                ? "If you need access, contact your system administrator."
+                : "Account creation is restricted to authorized administrators."}
+            </p>
 
             <div className="mt-6 text-center">
               <button

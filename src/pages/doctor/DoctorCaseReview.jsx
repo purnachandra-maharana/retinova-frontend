@@ -3,10 +3,8 @@ import {
   getCase,
   getCases,
   saveDoctorReview,
+  API_BASE_URL,
 } from "../../services/api";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 function DoctorCaseReview({
   caseData,
