@@ -1,6 +1,6 @@
 export const API_BASE_URL = (
   import.meta.env.VITE_API_URL ||
-  "https://retinova-backend-7rri.onrender.com/api"
+  "https://binary-regression-laboratory-pierre.trycloudflare.com/api"
 ).replace(/\/+$/, "");
 
 /* =========================================================
