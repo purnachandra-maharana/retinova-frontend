@@ -1090,7 +1090,7 @@ function PatientScreen({
         onNewScreening={() => {
           setWorkspaceMode("new");
           setSection(0);
-          setPhcError("");
+          setBackendError("");
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
         onPatients={() => setMenuPage("patients")}
