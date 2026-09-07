@@ -32,8 +32,8 @@ fprintf('============================================================\n\n');
 
 %% 1. PROJECT PATHS
 
-projectRoot = ...
-    'C:\Users\Aditya\OneDrive\Documents\MATLAB\DR FOLDER IMP\DATASETS\SIH26038_NEW';
+config = retinaProjectConfig();
+projectRoot = config.projectRoot;
 
 modelFile = fullfile( ...
     projectRoot, 'models', 'DR_ResNet50_SIH26038.mat');

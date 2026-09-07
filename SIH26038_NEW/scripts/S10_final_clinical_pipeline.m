@@ -51,17 +51,10 @@ fprintf('============================================================\n\n');
 % 1. PROJECT PATHS
 % =============================================================
 
-projectRoot = fileparts(fileparts(mfilename('fullpath')));
-
-modelPath = fullfile( ...
-    projectRoot, ...
-    'models', ...
-    'DR_ResNet50_SIH26038.mat');
-
-outputRoot = fullfile( ...
-    projectRoot, ...
-    'output', ...
-    'final_pipeline');
+config = retinaProjectConfig();
+projectRoot = config.projectRoot;
+modelPath = config.modelFile;
+outputRoot = config.finalOutputRoot;
 
 if ~exist(outputRoot, 'dir')
     mkdir(outputRoot);
@@ -123,13 +116,9 @@ fprintf('\nSelected Fundus Image : %s%s\n', ...
 % 3. READ FUNDUS IMAGE
 % =============================================================
 
-originalImage = imread(imagePath);
-
-if size(originalImage,3) == 1
-    originalImage = repmat(originalImage, [1 1 3]);
-end
-
-originalImage = im2uint8(originalImage);
+rawImage = imread(imagePath);
+originalImage = retinaPreprocessImage(rawImage, ...
+    [size(rawImage, 1), size(rawImage, 2), 3]);
 
 %% ============================================================
 % 4. IMAGE QUALITY ASSESSMENT
@@ -261,7 +250,8 @@ result = struct();
 % ------------------------------------------------------------
 
 result.imageName = string([imageName imageExt]);
-result.imagePath = string(imagePath);
+% Do not persist host paths or other identifying filesystem details.
+result.imagePath = string(imageName + imageExt);
 
 % ------------------------------------------------------------
 % Quality information
@@ -316,7 +306,7 @@ result.clinicalMessage = string(clinicalMessage);
 result.model = struct();
 
 result.model.name = "ResNet-50";
-result.model.inputSize = [224 224 3];
+result.model.inputSize = config.inputSize;
 result.model.task = ...
     "Five-class diabetic retinopathy severity classification";
 
@@ -349,7 +339,8 @@ result.system.pipeline = ...
 
 result.system.status = "Completed";
 
-result.system.timestamp = char(datetime("now"));
+result.system.timestamp = char(datetime("now", "TimeZone", "UTC"));
+result.system.executionEnvironment = retinaSelectExecutionEnvironment();
 
 %% ============================================================
 % 8. SAVE MATLAB RESULT
@@ -370,9 +361,8 @@ jsonResult = result;
 % JSON should contain paths rather than image matrices.
 jsonText = jsonencode(jsonResult, 'PrettyPrint', true);
 
-jsonOutput = fullfile( ...
-    jsonFolder, ...
-    [imageName '_clinical_result.json']);
+jsonOutput = fullfile(jsonFolder, ...
+    [retinaSafeFileName(imageName) '_clinical_result.json']);
 
 fid = fopen(jsonOutput, 'w');
 
@@ -383,7 +373,7 @@ if fid ~= -1
 
 else
 
-    warning('Could not create JSON output file.');
+    error('Could not create JSON output file: %s', jsonOutput);
 
 end
 
@@ -589,52 +579,22 @@ if ~isfile(modelPath)
     error('Trained model not found:\n%s', modelPath);
 end
 
-loadedData = load(modelPath);
-
-% Attempt to identify the trained network automatically.
-
-modelFields = fieldnames(loadedData);
-
-net = [];
-
-for i = 1:numel(modelFields)
-
-    candidate = loadedData.(modelFields{i});
-
-    if isa(candidate, 'DAGNetwork') || ...
-            isa(candidate, 'SeriesNetwork') || ...
-            isa(candidate, 'dlnetwork')
-
-        net = candidate;
-        break;
-    end
-
-end
-
-if isempty(net)
-
-    error(['No supported trained network object was found in ', ...
-           'DR_ResNet50_SIH26038.mat']);
-
-end
+modelMetadata = retinaValidateModel(modelPath, "activation_49_relu");
+net = modelMetadata.net;
 
 %% ---------------------------------------------------------------
 % Prepare image
 % ---------------------------------------------------------------
 
-inputImage = imresize(I, [224 224]);
-
-if size(inputImage,3) == 1
-    inputImage = repmat(inputImage, [1 1 3]);
-end
-
-inputImage = im2uint8(inputImage);
+inputImage = retinaPreprocessImage(I, modelMetadata.inputSize);
 
 %% ---------------------------------------------------------------
 % Classification
 % ---------------------------------------------------------------
 
-[predictedLabel, scores] = classify(net, inputImage);
+executionEnvironment = retinaSelectExecutionEnvironment();
+[predictedLabel, scores] = classify(net, inputImage, ...
+    'ExecutionEnvironment', executionEnvironment);
 
 scores = double(scores);
 
@@ -846,10 +806,11 @@ try
     % Generate Grad-CAM using numerical class index
     % ------------------------------------------------------------
 
-    scoreMap = gradCAM( ...
-        net, ...
-        inputImage, ...
-        predictedClassIndex, ...
+    if ~modelMetadata.featureLayerAvailable
+        error('Configured Grad-CAM feature layer is absent from the trained model.');
+    end
+
+    scoreMap = gradCAM(net, inputImage, predictedClassIndex, ...
         'FeatureLayer', targetLayer);
 
     fprintf('Grad-CAM computation completed.\n');
@@ -1076,8 +1037,7 @@ xai.classIndex = predictedClassIndex;
 xai.classLabel = ...
     string(networkClasses(predictedClassIndex));
 
-xai.gradCAMImagePath = ...
-    string(outputPath);
+xai.gradCAMImagePath = string(retinaSafeFileName(outputPath));
 
 xai.interpretation = ...
     "Grad-CAM highlights image regions that contributed to the predicted diabetic retinopathy classification.";

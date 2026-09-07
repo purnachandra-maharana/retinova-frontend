@@ -19,7 +19,8 @@ close all;
 % 1. PATHS
 % ================================================================
 
-projectRoot = 'C:\Users\Aditya\OneDrive\Documents\MATLAB\DR FOLDER IMP\DATASETS\SIH26038_NEW';
+config = retinaProjectConfig();
+projectRoot = config.projectRoot;
 
 modelPath = fullfile(projectRoot, 'models', ...
     'DR_ResNet50_SIH26038.mat');
@@ -330,7 +331,9 @@ if ~isfile(modelPath)
     error(['Model file not found: ' newline modelPath]);
 end
 
-load(modelPath, 'trainedNet', 'classNames');
+modelMetadata = retinaValidateModel(modelPath, "activation_49_relu");
+trainedNet = modelMetadata.net;
+classNames = categorical(modelMetadata.classNames);
 
 fprintf('Model loaded successfully.\n');
 fprintf('Model: ResNet-50\n');
@@ -339,12 +342,9 @@ fprintf('Model: ResNet-50\n');
 % 12. PREPARE IMAGE FOR RESNET-50
 % ================================================================
 
-modelImage = imresize(processedImage, [224 224]);
+modelImage = retinaPreprocessImage(processedImage, modelMetadata.inputSize);
 
 % Ensure RGB
-if size(modelImage,3) == 1
-    modelImage = repmat(modelImage, [1 1 3]);
-end
 
 %% ================================================================
 % 13. DR CLASSIFICATION
@@ -356,7 +356,8 @@ fprintf('------------------------------------------------------------\n');
 
 [predictedLabel, scores] = classify( ...
     trainedNet, ...
-    modelImage);
+    modelImage, ...
+    'ExecutionEnvironment', retinaSelectExecutionEnvironment());
 
 % Find predicted class index
 predictedIndex = find(classNames == predictedLabel);
@@ -524,4 +525,3 @@ fprintf('\nDISCLAIMER:\n');
 fprintf('%s\n', result.disclaimer);
 
 fprintf('\n============================================================\n');
-

@@ -26,8 +26,8 @@ close all;
 % 1. PROJECT PATHS
 % ================================================================
 
-projectRoot = ...
-    'C:\Users\Aditya\OneDrive\Documents\MATLAB\DR FOLDER IMP\DATASETS\SIH26038_NEW';
+config = retinaProjectConfig();
+projectRoot = config.projectRoot;
 
 modelPath = fullfile( ...
     projectRoot, ...

@@ -33,7 +33,8 @@ fprintf('============================================================\n\n');
 
 %% 1. PROJECT PATHS
 
-projectRoot = fileparts(fileparts(mfilename('fullpath')));
+config = retinaProjectConfig();
+projectRoot = config.projectRoot;
 
 modelFile = fullfile( ...
     projectRoot, ...
@@ -146,7 +147,7 @@ predictionStart = datetime('now');
 [YPred, scores] = classify( ...
     trainedNet, ...
     augimdsTest, ...
-    'ExecutionEnvironment', 'gpu');
+    'ExecutionEnvironment', retinaSelectExecutionEnvironment());
 
 predictionEnd = datetime('now');
 

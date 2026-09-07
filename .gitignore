@@ -18,6 +18,12 @@ backend/uploads/
 # MATLAB generated/cache files
 *.asv
 *.m~ 
+SIH26038_NEW/output/
+SIH26038_NEW/scripts/slprj/
+SIH26038_NEW/scripts/work/
+SIH26038_NEW/simulink/*.prebuild.bak.slx
+SIH26038_NEW/simulink/*.autosave.slx
+SIH26038_NEW/simulink/*.lock
 
 # Python
 __pycache__/

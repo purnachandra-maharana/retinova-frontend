@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+  (import.meta.env.VITE_API_URL || "/api").replace(/\/+$/, "");
 
 /* =========================================================
    GENERIC REQUEST HELPER
@@ -8,6 +8,7 @@ const API_BASE_URL =
 async function request(endpoint, options = {}) {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
+    credentials: "include",
     headers: {
       ...(options.body instanceof FormData
         ? {}
@@ -34,6 +35,21 @@ async function request(endpoint, options = {}) {
   }
 
   return data;
+}
+
+export async function login(username, password) {
+  return request("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ username, password }),
+  });
+}
+
+export async function getCurrentUser() {
+  return request("/auth/me");
+}
+
+export async function logout() {
+  return request("/auth/logout", { method: "POST" });
 }
 
 
@@ -314,6 +330,9 @@ export async function getClinicalReport(
    ========================================================= */
 
 export default {
+  login,
+  getCurrentUser,
+  logout,
   checkBackendHealth,
 
   createPatient,

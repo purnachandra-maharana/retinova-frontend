@@ -1,12 +1,26 @@
 %% RetinaSafe Telemedicine Simulation
 % Complete rebuild of the prototype Simulink workflow
 
+scriptRoot = fileparts(mfilename('fullpath'));
+projectRoot = fileparts(scriptRoot);
 model = 'S11_telemedicine_simulation';
+modelFile = fullfile(scriptRoot, [model '.slx']);
+backupFile = fullfile(scriptRoot, [model '.prebuild.bak.slx']);
+
+if ~isfile(modelFile)
+    error('Simulink model not found: %s', modelFile);
+end
+
+% Preserve the checked-in model before any destructive rebuild operation.
+if ~isfile(backupFile)
+    copyfile(modelFile, backupFile);
+end
 
 %% Load model
-if ~bdIsLoaded(model)
-    load_system(model);
+if bdIsLoaded(model)
+    close_system(model, 0);
 end
+load_system(modelFile);
 
 %% Remove all existing blocks and lines
 % Start from a completely clean canvas.
@@ -255,7 +269,7 @@ Simulink.Annotation( ...
 
 %% Save
 
-save_system(model);
+save_system(model, modelFile);
 
 %% Fit model to screen
 

@@ -139,4 +139,10 @@ SIH MATLAB PROJECT/
 ├── MATLAB/
 
 └── README.md
+```
 
+## Deployment hardening
+
+MATLAB portability, GPU/CPU fallback, model and Grad-CAM checks, output
+privacy, Simulink safety, and generated-artifact cleanup are documented in
+[`docs/DEPLOYMENT_HARDENING.md`](docs/DEPLOYMENT_HARDENING.md).

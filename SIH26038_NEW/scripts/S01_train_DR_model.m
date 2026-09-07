@@ -33,7 +33,8 @@ fprintf('============================================================\n\n');
 
 %% 1. PROJECT PATHS
 
-projectRoot = fileparts(fileparts(mfilename('fullpath')));
+config = retinaProjectConfig();
+projectRoot = config.projectRoot;
 
 trainCSV = fullfile(projectRoot, 'splits', 'train.csv');
 valCSV   = fullfile(projectRoot, 'splits', 'validation.csv');
@@ -330,6 +331,7 @@ end
 % If MATLAB reports GPU out-of-memory, reduce this to 4.
 
 miniBatchSize = 8;
+executionEnvironment = retinaSelectExecutionEnvironment();
 
 validationFrequency = max(1, ...
     floor(numel(balancedLabels) / miniBatchSize));
@@ -343,7 +345,7 @@ options = trainingOptions('adam', ...
     'ValidationFrequency', validationFrequency, ...
     'Verbose', true, ...
     'Plots', 'training-progress', ...
-    'ExecutionEnvironment', 'gpu', ...
+    'ExecutionEnvironment', executionEnvironment, ...
     'L2Regularization', 1e-4, ...
     'GradientThreshold', 1);
 
@@ -362,8 +364,7 @@ fprintf('Mini-batch size    : %d\n', miniBatchSize);
 fprintf('Maximum epochs     : %d\n', options.MaxEpochs);
 fprintf('Initial LR         : %.1e\n', options.InitialLearnRate);
 fprintf('Optimizer          : Adam\n');
-fprintf('Execution          : GPU\n');
-fprintf('GPU                : NVIDIA RTX 3050 4 GB\n');
+fprintf('Execution          : %s\n', executionEnvironment);
 fprintf('============================================================\n\n');
 
 %% 17. TRAIN MODEL
@@ -436,7 +437,7 @@ fprintf('Running a quick validation prediction...\n');
 [YPred, scores] = classify( ...
     trainedNet, ...
     augimdsValidation, ...
-    'ExecutionEnvironment', 'gpu');
+    'ExecutionEnvironment', executionEnvironment);
 
 YValidation = imdsValidation.Labels;
 

@@ -32,8 +32,8 @@ fprintf('============================================================\n\n');
 
 %% 1. PATH CONFIGURATION
 
-projectRoot = ...
-    'C:\Users\Aditya\OneDrive\Documents\MATLAB\DR FOLDER IMP\DATASETS\SIH26038_NEW';
+config = retinaProjectConfig();
+projectRoot = config.projectRoot;
 
 idridRoot = fullfile(projectRoot, 'data', 'IDRiD');
 
