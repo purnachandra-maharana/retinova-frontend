@@ -1,6 +1,10 @@
+const MATLAB_WORKER_API_URL =
+  "https://binary-regression-laboratory-pierre.trycloudflare.com/api";
+
 export const API_BASE_URL = (
-  import.meta.env.VITE_API_URL ||
-  "https://binary-regression-laboratory-pierre.trycloudflare.com/api"
+  import.meta.env.VITE_USE_RENDER_API === "true"
+    ? import.meta.env.VITE_API_URL || MATLAB_WORKER_API_URL
+    : MATLAB_WORKER_API_URL
 ).replace(/\/+$/, "");
 
 /* =========================================================
