@@ -2,7 +2,6 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
 
 const pool = require("./config/db");
 
@@ -13,6 +12,8 @@ const findingRoutes = require("./routes/findingRoutes");
 const doctorRoutes = require("./routes/doctorRoutes");
 const caseRoutes = require("./routes/caseRoutes");
 const reportRoutes = require("./routes/reportRoutes");
+const { router: authRoutes } = require("./routes/authRoutes");
+const { requireAuth } = require("./middleware/auth");
 
 const app = express();
 
@@ -29,20 +30,13 @@ const PORT = Number(process.env.PORT) || 10000;
 // Allow frontend requests
 app.use(cors());
 
-// Parse JSON request bodies
-app.use(express.json());
+// Parse bounded request bodies
+app.use(express.json({ limit: "1mb" }));
 
 // Parse URL-encoded request bodies
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
-// ============================================
-// SERVE UPLOADED FILES
-// ============================================
-
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "uploads"))
-);
+app.use("/api/auth", authRoutes);
 
 // ============================================
 // BASIC ROUTE
@@ -100,25 +94,25 @@ app.get("/api/health/db", async (req, res) => {
 // ============================================
 
 // Patient APIs
-app.use("/api/patients", patientRoutes);
+app.use("/api/patients", requireAuth, patientRoutes);
 
 // Screening APIs
-app.use("/api/screenings", screeningRoutes);
+app.use("/api/screenings", requireAuth, screeningRoutes);
 
 // AI APIs
-app.use("/api/ai", aiRoutes);
+app.use("/api/ai", requireAuth, aiRoutes);
 
 // Clinical Findings APIs
-app.use("/api/findings", findingRoutes);
+app.use("/api/findings", requireAuth, findingRoutes);
 
 // Doctor APIs
-app.use("/api/doctors", doctorRoutes);
+app.use("/api/doctors", requireAuth, doctorRoutes);
 
 // Complete Case APIs
-app.use("/api/cases", caseRoutes);
+app.use("/api/cases", requireAuth, caseRoutes);
 
 // Clinical Report APIs
-app.use("/api/reports", reportRoutes);
+app.use("/api/reports", requireAuth, reportRoutes);
 
 // ============================================
 // 404 HANDLER
@@ -149,6 +143,10 @@ app.use((err, req, res, next) => {
 // START SERVER
 // ============================================
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Retinova Backend running on port ${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Retinova Backend running on port ${PORT}`);
+  });
+}
+
+module.exports = app;
